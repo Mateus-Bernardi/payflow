@@ -1,13 +1,13 @@
 package com.payflow.ms_wallet.controller;
 
+import com.payflow.ms_wallet.dto.TransferRequestDTO;
 import com.payflow.ms_wallet.model.Wallet;
 import com.payflow.ms_wallet.service.WalletService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -26,5 +26,15 @@ public class WalletController {
         Wallet wallet = walletService.getWalletByUserId(UUID.fromString(userId));
 
         return ResponseEntity.ok(wallet);
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<String> transfer(@RequestBody @Valid TransferRequestDTO transferDto) {
+
+        String senderId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        walletService.transfer(UUID.fromString(senderId), transferDto);
+
+        return ResponseEntity.ok("Transferência realizada com sucesso!");
     }
 }

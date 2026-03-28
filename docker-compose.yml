@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:16
     container_name: payflow-db
     environment:
       POSTGRES_USER: user
@@ -22,4 +22,15 @@ services:
     container_name: payflow-mq
     ports:
       - "5672:5672"
-      - "15672:15672" # Painel de controle do RabbitMQ
+      - "15672:15672"
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: payflow-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@payflow.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
