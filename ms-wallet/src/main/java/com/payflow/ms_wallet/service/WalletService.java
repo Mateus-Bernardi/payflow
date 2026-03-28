@@ -1,9 +1,12 @@
 package com.payflow.ms_wallet.service;
 
+import com.payflow.ms_wallet.config.RabbitMQConfig;
+import com.payflow.ms_wallet.dto.TransferEvent;
 import com.payflow.ms_wallet.dto.TransferRequestDTO;
 import com.payflow.ms_wallet.model.Wallet;
 import com.payflow.ms_wallet.repository.WalletRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,9 @@ public class WalletService {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     public Wallet getWalletByUserId(UUID userId) {
         return walletRepository.findByUserId(userId)
@@ -61,5 +67,11 @@ public class WalletService {
 
         walletRepository.save(senderWallet);
         walletRepository.save(receiverWallet);
+
+        TransferEvent event = new TransferEvent(senderId, transferDto.receiverId(), transferDto.value());
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.TRANSFER_NOTIFICATION_QUEUE, event);
+
+        System.out.println("Evento de transferência enviado para a fila!");
     }
 }
