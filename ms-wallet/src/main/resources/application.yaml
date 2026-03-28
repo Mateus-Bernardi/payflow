@@ -21,3 +21,8 @@ api:
     token:
       secret: "payflow-secreto-123456"
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+

@@ -5,16 +5,21 @@ import com.payflow.ms_wallet.model.Wallet;
 import com.payflow.ms_wallet.repository.WalletRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class WalletService {
 
     @Autowired
     WalletRepository walletRepository;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     public Wallet getWalletByUserId(UUID userId) {
         return walletRepository.findByUserId(userId)
@@ -27,7 +32,15 @@ public class WalletService {
     }
 
     @Transactional
-    public void transfer(UUID senderId, TransferRequestDTO transferDto) {
+    public void transfer(UUID senderId, TransferRequestDTO transferDto, String idempotencyKey) {
+
+        String key = "transfer_idempotency:" + idempotencyKey;
+
+        Boolean isFirstRequest = redisTemplate.opsForValue().setIfAbsent(key, "processed", 5, TimeUnit.MINUTES);
+
+        if (Boolean.FALSE.equals(isFirstRequest)) {
+            throw new RuntimeException("Esta transação já foi processada ou está em processamento.");
+        }
 
         if (senderId.equals(transferDto.receiverId())) {
             throw new RuntimeException("Você não pode transferir dinheiro para si mesmo.");

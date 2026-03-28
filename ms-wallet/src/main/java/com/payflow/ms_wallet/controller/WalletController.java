@@ -29,11 +29,13 @@ public class WalletController {
     }
 
     @PostMapping("/transfer")
-    public ResponseEntity<String> transfer(@RequestBody @Valid TransferRequestDTO transferDto) {
-
+    public ResponseEntity<String> transfer(
+            @RequestBody @Valid TransferRequestDTO transferDto,
+            @RequestHeader("X-Idempotency-Key") String idempotencyKey
+    ) {
         String senderId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        walletService.transfer(UUID.fromString(senderId), transferDto);
+        walletService.transfer(UUID.fromString(senderId), transferDto, idempotencyKey);
 
         return ResponseEntity.ok("Transferência realizada com sucesso!");
     }
