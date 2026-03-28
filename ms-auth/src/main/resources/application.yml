@@ -1,0 +1,21 @@
+server:
+  port: 8081 # Este serviço rodará na porta 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payflow_db
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update # O Hibernate cria/atualiza as tabelas automaticamente
+    show-sql: true # Mostra no console os comandos SQL que o Java está gerando
+    properties:
+      hibernate:
+        format_sql: true
+api:
+  security:
+    token:
+      secret: "payflow-secreto-123456"
