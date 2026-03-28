@@ -1,0 +1,7 @@
+server:
+  port: 8084
+
+openrouter:
+  api-key: ${OPENROUTER_API_KEY}
+  base-url: https://openrouter.ai/api/v1
+  model: stepfun/step-3.5-flash:free

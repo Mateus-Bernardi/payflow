@@ -7,7 +7,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class NotificationConsumer {
 
-    @RabbitListener(queues = "transfer.notification")
+    @RabbitListener(bindings = @org.springframework.amqp.rabbit.annotation.QueueBinding(
+            value = @org.springframework.amqp.rabbit.annotation.Queue(value = "queue.notification", durable = "true"),
+            exchange = @org.springframework.amqp.rabbit.annotation.Exchange(value = "transfer.exchange", type = "fanout")
+    ))
     public void listenTransferNotification(TransferEvent event) {
 
         System.out.println("--------------------------------------------------");

@@ -68,10 +68,10 @@ public class WalletService {
         walletRepository.save(senderWallet);
         walletRepository.save(receiverWallet);
 
-        TransferEvent event = new TransferEvent(senderId, transferDto.receiverId(), transferDto.value());
+        TransferEvent event = new TransferEvent(senderId, transferDto.receiverId(), transferDto.value(), transferDto.description());
 
-        rabbitTemplate.convertAndSend(RabbitMQConfig.TRANSFER_NOTIFICATION_QUEUE, event);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.TRANSFER_EXCHANGE, "", event);
 
-        System.out.println("Evento de transferência enviado para a fila!");
+        System.out.println("Evento enviado para a Central de Distribuição (Exchange)!");
     }
 }

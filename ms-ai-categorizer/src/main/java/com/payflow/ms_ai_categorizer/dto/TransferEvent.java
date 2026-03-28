@@ -1,4 +1,4 @@
-package com.payflow.ms_wallet.dto;
+package com.payflow.ms_ai_categorizer.dto;
 
 import java.math.BigDecimal;
 import java.util.UUID;
