@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: payflow-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: payflow_db
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:latest
+    container_name: payflow-redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: payflow-mq
+    ports:
+      - "5672:5672"
+      - "15672:15672" # Painel de controle do RabbitMQ
