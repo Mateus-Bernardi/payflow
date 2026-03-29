@@ -45,16 +45,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data) {
 
-        // 1. Criamos um "Ticket" com o email e a senha puros que o usuário digitou
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
 
-        // 2. O Manager vai pegar esse ticket, ir lá no AuthorizationService, buscar no banco, criptografar a senha digitada e comparar com o hash do banco. Tudo sozinho!
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
-        // 3. Se deu certo, geramos o Token JWT (A pulseira VIP!)
         var token = tokenService.generateToken((User) auth.getPrincipal());
 
-        // 4. Devolvemos o token para o cliente
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 }

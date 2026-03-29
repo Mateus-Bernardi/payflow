@@ -1,6 +1,7 @@
 package com.payflow.ms_wallet.controller;
 
 import com.payflow.ms_wallet.dto.TransferRequestDTO;
+import com.payflow.ms_wallet.model.Transaction;
 import com.payflow.ms_wallet.model.Wallet;
 import com.payflow.ms_wallet.service.WalletService;
 import jakarta.validation.Valid;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -38,5 +40,16 @@ public class WalletController {
         walletService.transfer(UUID.fromString(senderId), transferDto, idempotencyKey);
 
         return ResponseEntity.ok("Transferência realizada com sucesso!");
+    }
+
+    @GetMapping("/statement")
+    public ResponseEntity<List<Transaction>> getStatement() {
+
+        String userIdStr = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UUID userId = UUID.fromString(userIdStr);
+
+        List<Transaction> statement = walletService.getStatement(userId);
+
+        return ResponseEntity.ok(statement);
     }
 }
