@@ -1,6 +1,35 @@
 # PayFlow
 
+![Java](https://img.shields.io/badge/java-21-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/spring_boot-3.5.13-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/Rabbitmq-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/docker_compose-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+
 Plataforma de pagamentos em arquitetura de microsservicos com foco em transferencias seguras, processamento assincrono e enriquecimento inteligente de dados com IA.
+
+## Índice
+
+- [Visao Geral](#visao-geral)
+- [Principais Destaques](#principais-destaques)
+- [Arquitetura](#arquitetura)
+- [Stack Tecnologica](#stack-tecnologica)
+- [Microsservicos em Detalhes](#microsservicos-em-detalhes)
+- [Fluxo de Transferencia (Fim a Fim)](#fluxo-de-transferencia-fim-a-fim)
+- [Contratos de API (Exemplos)](#contratos-de-api-exemplos)
+- [Padrao de Erro](#padrao-de-erro)
+- [Infraestrutura Local](#infraestrutura-local)
+- [Configuracao de Ambiente](#configuracao-de-ambiente)
+- [Como Executar](#como-executar)
+- [Testes](#testes)
+- [Estrutura do Repositorio](#estrutura-do-repositorio)
+- [Roadmap Sugerido](#roadmap-sugerido)
+- [Contribuicao](#contribuicao)
+- [Licenca](#licenca)
+- [Autor](#autor)
+
+---
 
 ## Visao Geral
 
@@ -172,6 +201,8 @@ Servico de notificacao baseado em eventos.
 
 ## Contratos de API (Exemplos)
 
+> **Dica:** Voce pode testar facilmente todos esses endpoints em sua maquina. Considere criar uma **Collection do Postman / Insomnia** para salvar e importar as requisicoes.
+
 ### Registro
 
 POST /auth/register
@@ -271,39 +302,45 @@ Os servicos ms-auth e ms-wallet retornam um payload padrao para erros:
 
 ## Infraestrutura Local
 
-Arquivo: docker-compose.yml
+A infraestrutura necessaria roda via `docker-compose.yml`. Para facilitar o acesso as ferramentas visuais de gerenciamento, utilize as credenciais padrao ja configuradas:
 
-Servicos provisionados:
-
-- PostgreSQL: 5432
-- Redis: 6379
-- RabbitMQ AMQP: 5672
-- RabbitMQ Management: 15672
-- pgAdmin: 8080
+| Servico | Porta | Painel / Conexao | Usuario | Senha |
+| --- | --- | --- | --- | --- |
+| **PostgreSQL** | `5432` | Conexao Local (Ex: DBeaver) | `user` | `password` |
+| **pgAdmin** | `8080` | [http://localhost:8080](http://localhost:8080) | `admin@payflow.com` | `admin` |
+| **RabbitMQ Mgmt**| `15672` | [http://localhost:15672](http://localhost:15672) | `guest` | `guest` |
+| **RabbitMQ AMQP**| `5672` | Conexao Interna | - | - |
+| **Redis** | `6379` | Conexao Interna | - | - |
 
 ## Configuracao de Ambiente
 
-O projeto utiliza variaveis de ambiente via arquivo .env na raiz.
+O projeto utiliza variaveis de ambiente lidas de um arquivo `.env` na raiz do sistema.
 
-### Variaveis esperadas
+### Exemplo de `.env` (`.env.example`)
 
-- DB_URL
-- DB_USERNAME
-- DB_PASSWORD
-- RABBITMQ_USER
-- RABBITMQ_PASSWORD
-- RABBITMQ_HOST
-- JWT_SECRET
-- REDIS_HOST
-- OPENROUTER_API_KEY
+Crie um arquivo `.env` na pasta raiz do repositorio usando o modelo abaixo e preencha com as suas proprias chaves (principalmente a `OPENROUTER_API_KEY`):
 
-### Observacao importante de seguranca
+```env
+# Banco de Dados (PostgreSQL Docker)
+DB_URL=jdbc:postgresql://localhost:5432/payflow_db
+DB_USERNAME=user
+DB_PASSWORD=password
 
-Nunca publique chaves reais em repositorios publicos. Para GitHub, recomenda-se:
+# Mensageria (RabbitMQ Docker)
+RABBITMQ_HOST=localhost
+RABBITMQ_USER=guest
+RABBITMQ_PASSWORD=guest
 
-1. Criar um arquivo .env.example sem segredos.
-2. Manter .env no .gitignore.
-3. Rotacionar imediatamente qualquer chave que tenha sido exposta.
+# Cache / Idempotencia (Redis Docker)
+REDIS_HOST=localhost
+
+# Seguranca
+JWT_SECRET=sua-chave-secreta-muito-segura-e-longa-aqui-123456789
+
+# Integracao IA
+OPENROUTER_API_KEY=sua-chave-do-openrouter-aqui
+```
+
 
 ## Como Executar
 
@@ -339,7 +376,8 @@ cd ms-notification
 ./mvnw spring-boot:run
 ```
 
-No Windows (cmd/powershell), use mvnw.cmd no lugar de ./mvnw.
+> [!NOTE]
+> **Aviso para Windows:** Utilize `mvnw.cmd spring-boot:run` no CMD / PowerShell em vez de `./mvnw`.
 
 ### 3. Ordem recomendada
 
@@ -374,7 +412,7 @@ payflow/
 |- ms-notification/
 ```
 
-## Roadmap Sugerido
+## Proximos passos
 
 - Observabilidade com OpenTelemetry + Prometheus + Grafana.
 - API Gateway para centralizar autenticacao e roteamento.
@@ -395,7 +433,7 @@ Contribuicoes sao bem-vindas. Para colaborar:
 
 ## Licenca
 
-Defina aqui a licenca do projeto (ex: MIT) antes de publicar em producao.
+Este projeto esta licenciado sob a licenca MIT.
 
 ## Autor
 
