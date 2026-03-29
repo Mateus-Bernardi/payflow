@@ -3,6 +3,10 @@ package com.payflow.ms_wallet.service;
 import com.payflow.ms_wallet.config.RabbitMQConfig;
 import com.payflow.ms_wallet.dto.TransferEvent;
 import com.payflow.ms_wallet.dto.TransferRequestDTO;
+import com.payflow.ms_wallet.exception.DuplicateTransferException;
+import com.payflow.ms_wallet.exception.InsufficientBalanceException;
+import com.payflow.ms_wallet.exception.InvalidTransferException;
+import com.payflow.ms_wallet.exception.WalletNotFoundException;
 import com.payflow.ms_wallet.model.Transaction;
 import com.payflow.ms_wallet.model.Wallet;
 import com.payflow.ms_wallet.repository.TransactionRepository;
@@ -54,21 +58,21 @@ public class WalletService {
         Boolean isFirstRequest = redisTemplate.opsForValue().setIfAbsent(key, "processed", 5, TimeUnit.MINUTES);
 
         if (Boolean.FALSE.equals(isFirstRequest)) {
-            throw new RuntimeException("Esta transação já foi processada ou está em processamento.");
+            throw new DuplicateTransferException("Transacao ja processada ou em processamento");
         }
 
         if (senderId.equals(transferDto.receiverId())) {
-            throw new RuntimeException("Você não pode transferir dinheiro para si mesmo.");
+            throw new InvalidTransferException("Nao e permitido transferir para a propria conta");
         }
 
         Wallet senderWallet = walletRepository.findByUserId(senderId)
-                .orElseThrow(() -> new RuntimeException("Carteira do remetente não encontrada."));
+                .orElseThrow(() -> new WalletNotFoundException("Carteira do remetente nao encontrada"));
 
         Wallet receiverWallet = walletRepository.findByUserId(transferDto.receiverId())
-                .orElseThrow(() -> new RuntimeException("Carteira do destinatário não encontrada."));
+                .orElseThrow(() -> new WalletNotFoundException("Carteira do destinatario nao encontrada"));
 
         if (senderWallet.getBalance().compareTo(transferDto.value()) < 0) {
-            throw new RuntimeException("Saldo insuficiente.");
+            throw new InsufficientBalanceException("Saldo insuficiente");
         }
 
         senderWallet.setBalance(senderWallet.getBalance().subtract(transferDto.value()));
@@ -93,7 +97,7 @@ public class WalletService {
         );
 
         rabbitTemplate.convertAndSend(RabbitMQConfig.TRANSFER_EXCHANGE, "", event);
-        System.out.println("Transação salva e Evento enviado para a Exchange!");
+        System.out.println("Transacao salva e evento enviado para a exchange");
     }
 
     @Cacheable(value = "statement", key = "#userId")

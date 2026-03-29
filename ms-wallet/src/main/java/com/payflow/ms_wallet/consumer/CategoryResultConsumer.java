@@ -1,6 +1,7 @@
 package com.payflow.ms_wallet.consumer;
 
 import com.payflow.ms_wallet.dto.CategoryResultEvent;
+import com.payflow.ms_wallet.exception.TransactionNotFoundException;
 import com.payflow.ms_wallet.model.Transaction;
 import com.payflow.ms_wallet.repository.TransactionRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,7 +22,7 @@ public class CategoryResultConsumer {
         System.out.println("Recebendo categorização da IA para a transação: " + result.transactionId());
 
         Transaction transaction = transactionRepository.findById(result.transactionId())
-                .orElseThrow(() -> new RuntimeException("Transação não encontrada para atualização de categoria"));
+            .orElseThrow(() -> new TransactionNotFoundException("Transacao nao encontrada para categorizacao"));
 
         transaction.setCategory(result.category());
 

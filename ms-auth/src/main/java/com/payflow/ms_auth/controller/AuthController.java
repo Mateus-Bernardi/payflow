@@ -3,6 +3,7 @@ package com.payflow.ms_auth.controller;
 import com.payflow.ms_auth.dto.AuthenticationDTO;
 import com.payflow.ms_auth.dto.LoginResponseDTO;
 import com.payflow.ms_auth.dto.UserDTO;
+import com.payflow.ms_auth.exception.EmailAlreadyRegisteredException;
 import com.payflow.ms_auth.model.User;
 import com.payflow.ms_auth.repository.UserRepository;
 import com.payflow.ms_auth.service.TokenService;
@@ -34,6 +35,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<User> saveUser(@RequestBody @Valid UserDTO userDto) {
+        if (userRepository.existsByEmail(userDto.email())) {
+            throw new EmailAlreadyRegisteredException("E-mail ja cadastrado");
+        }
+
         var user = new User();
         BeanUtils.copyProperties(userDto, user);
 
